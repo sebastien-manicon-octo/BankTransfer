@@ -3,9 +3,19 @@ package com.banktransfer;
 import com.banktransfer.external.ExternalSideEffectException;
 import com.banktransfer.external.GlobalState;
 import com.banktransfer.external.HttpRiskClient;
-import com.banktransfer.external.NativeSql;
 
 public class MegaTransferEngine {
+
+    private BalanceRepository balanceRepository;
+
+    public MegaTransferEngine() {
+        this(new SqlBalanceRepository());
+
+    }
+
+    public MegaTransferEngine(BalanceRepository balanceRepository) {
+        this.balanceRepository = balanceRepository;
+    }
 
     public boolean doIt(TData d, String channel) throws ExternalSideEffectException {
 
@@ -32,13 +42,12 @@ public class MegaTransferEngine {
         int net = d.c - fee;
 
         // BUG volontaire : net peut être négatif mais on continue
-        NativeSql sql = new NativeSql();
 
         int balance;
         if (GlobalState.cache.containsKey(d.a)) {
             balance = GlobalState.cache.get(d.a);
         } else {
-            balance = sql.queryBalance(d.a);
+            balance = balanceRepository.queryBalance(d.a);
             GlobalState.cache.put(d.a, balance);
         }
 
@@ -50,13 +59,13 @@ public class MegaTransferEngine {
             }
         }
 
-        sql.updateBalance(d.a, balance - d.c);
+        balanceRepository.updateBalance(d.a, balance - d.c);
 
         if (net % 2 == 0) {
-            sql.updateBalance(d.b, net);
+            balanceRepository.updateBalance(d.b, net);
         } else {
-            sql.updateBalance(d.b, net - 1);
-            sql.updateBalance(d.b, 1);
+            balanceRepository.updateBalance(d.b, net - 1);
+            balanceRepository.updateBalance(d.b, 1);
         }
 
         if (GlobalState.transferCount > 100) {
