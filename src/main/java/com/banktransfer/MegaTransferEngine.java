@@ -6,7 +6,7 @@ import com.banktransfer.external.HttpRiskClient;
 
 public class MegaTransferEngine {
 
-    private BalanceRepository balanceRepository;
+    private final BalanceRepository balanceRepository;
 
     public MegaTransferEngine() {
         this(new SqlBalanceRepository());
