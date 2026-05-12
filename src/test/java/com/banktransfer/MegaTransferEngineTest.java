@@ -3,6 +3,8 @@ package com.banktransfer;
 import com.banktransfer.external.ExternalSideEffectException;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -18,7 +20,9 @@ class MegaTransferEngineTest {
         RiskClient riskClient = mock(RiskClient.class);
         when(riskClient.risky(anyString(), anyInt())).thenReturn(true);
 
-        MegaTransferEngine megaTransferEngine = new MegaTransferEngine(repository, riskClient);
+        GState gState = new GStateFake(false, 0, new HashMap<>());
+
+        MegaTransferEngine megaTransferEngine = new MegaTransferEngine(repository, riskClient, gState);
         TData d = new TData();
         megaTransferEngine.doIt(d, "");
     }
