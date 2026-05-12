@@ -2,19 +2,20 @@ package com.banktransfer;
 
 import com.banktransfer.external.ExternalSideEffectException;
 import com.banktransfer.external.GlobalState;
-import com.banktransfer.external.HttpRiskClient;
 
 public class MegaTransferEngine {
 
     private final BalanceRepository balanceRepository;
+    private final RiskClient http;
 
     public MegaTransferEngine() {
-        this(new SqlBalanceRepository());
+        this(new SqlBalanceRepository(), new HttpRiskClientWrapper());
 
     }
 
-    public MegaTransferEngine(BalanceRepository balanceRepository) {
+    public MegaTransferEngine(BalanceRepository balanceRepository, RiskClient riskClient) {
         this.balanceRepository = balanceRepository;
+        this.http = riskClient;
     }
 
     public boolean doIt(TData d, String channel) throws ExternalSideEffectException {
@@ -51,7 +52,7 @@ public class MegaTransferEngine {
             GlobalState.cache.put(d.a, balance);
         }
 
-        HttpRiskClient http = new HttpRiskClient();
+
 
         if (http.risky(d.a, net)) {
             if (!d.d) {
