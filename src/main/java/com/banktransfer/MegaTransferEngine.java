@@ -37,37 +37,37 @@ public class MegaTransferEngine {
             }
         }
 
-        if (d.d) {
+        if (d.vip) {
             fee--;
         }
 
-        int net = d.c - fee;
+        int net = d.amount - fee;
 
         // BUG volontaire : net peut être négatif mais on continue
 
         int balance;
-        if (gState.cacheContainKey(d.a)) {
-            balance = gState.cacheGetValue(d.a);
+        if (gState.cacheContainKey(d.from)) {
+            balance = gState.cacheGetValue(d.from);
         } else {
-            balance = balanceRepository.queryBalance(d.a);
-            gState.cachePutValue(d.a, balance);
+            balance = balanceRepository.queryBalance(d.from);
+            gState.cachePutValue(d.from, balance);
         }
 
 
 
-        if (http.risky(d.a, net)) {
-            if (!d.d) {
+        if (http.risky(d.from, net)) {
+            if (!d.vip) {
                 return false;
             }
         }
 
-        balanceRepository.updateBalance(d.a, balance - d.c);
+        balanceRepository.updateBalance(d.from, balance - d.amount);
 
         if (net % 2 == 0) {
-            balanceRepository.updateBalance(d.b, net);
+            balanceRepository.updateBalance(d.to, net);
         } else {
-            balanceRepository.updateBalance(d.b, net - 1);
-            balanceRepository.updateBalance(d.b, 1);
+            balanceRepository.updateBalance(d.to, net - 1);
+            balanceRepository.updateBalance(d.to, 1);
         }
 
         if (gState.getTransferCount() > 100) {

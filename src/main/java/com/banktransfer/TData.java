@@ -1,8 +1,8 @@
 package com.banktransfer;
 
 public class TData {
-    public String a; // from
-    public String b; // to
-    public int c;    // amount
-    public boolean d; // vip
+    public String from; // from
+    public String to; // to
+    public int amount;    // amount
+    public boolean vip; // vip
 }
