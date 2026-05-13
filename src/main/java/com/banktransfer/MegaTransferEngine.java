@@ -14,7 +14,7 @@ public class MegaTransferEngine {
     }
 
     public MegaTransferEngine(BalanceRepository balanceRepository, RiskClient riskClient, GState gState) {
-        this.balanceRepository = balanceRepository;
+        this.balanceRepository = new CacheBalanceRepository(balanceRepository, gState);
         this.http = riskClient;
         this.gState = gState;
     }
@@ -45,15 +45,7 @@ public class MegaTransferEngine {
 
         // BUG volontaire : net peut être négatif mais on continue
 
-        int balance;
-        if (gState.cacheContainKey(d.from)) {
-            balance = gState.cacheGetValue(d.from);
-        } else {
-            balance = balanceRepository.queryBalance(d.from);
-            gState.cachePutValue(d.from, balance);
-        }
-
-
+        int balance = balanceRepository.queryBalance(d.from);
 
         if (http.risky(d.from, net)) {
             if (!d.vip) {
