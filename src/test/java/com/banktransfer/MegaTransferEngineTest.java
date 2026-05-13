@@ -35,7 +35,7 @@ class MegaTransferEngineTest {
 
         MegaTransferEngine megaTransferEngine = new MegaTransferEngine(balanceRepository, riskClient_false, gState);
         assertThatThrownBy(() ->
-                megaTransferEngine.doIt(d, ""))
+                megaTransferEngine.doIt(d, Channel.Other))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -44,7 +44,7 @@ class MegaTransferEngineTest {
         GState gState = new GStateFake(false, 0, new HashMap<>());
         MegaTransferEngine megaTransferEngine = new MegaTransferEngine(balanceRepository, riskClient_false, gState);
 
-        boolean result = megaTransferEngine.doIt(d, "MOBILE");
+        boolean result = megaTransferEngine.doIt(d, Channel.Mobile);
 
         assertThat(result).isTrue();
         verify(balanceRepository).updateBalance("id_user1", 100);
@@ -57,7 +57,7 @@ class MegaTransferEngineTest {
         GState gState = new GStateFake(false, 0, new HashMap<>());
         MegaTransferEngine megaTransferEngine = new MegaTransferEngine(balanceRepository, riskClient_false, gState);
 
-        boolean result = megaTransferEngine.doIt(d, "WEB");
+        boolean result = megaTransferEngine.doIt(d, Channel.Web);
 
         assertThat(result).isTrue();
         verify(balanceRepository).updateBalance("id_user1", 100);
@@ -70,7 +70,7 @@ class MegaTransferEngineTest {
         GState gState = new GStateFake(false, 0, new HashMap<>());
         MegaTransferEngine megaTransferEngine = new MegaTransferEngine(balanceRepository, riskClient_false, gState);
 
-        boolean result = megaTransferEngine.doIt(d, "OTHER");
+        boolean result = megaTransferEngine.doIt(d, Channel.Other);
 
         assertThat(result).isTrue();
         verify(balanceRepository).updateBalance("id_user1", 100);
@@ -83,7 +83,7 @@ class MegaTransferEngineTest {
         GState gState = new GStateFake(false, 0, new HashMap<>());
         MegaTransferEngine megaTransferEngine = new MegaTransferEngine(balanceRepository, riskClient_false, gState);
 
-        boolean result = megaTransferEngine.doIt(d, "WEB");
+        boolean result = megaTransferEngine.doIt(d, Channel.Web);
 
         assertThat(result).isTrue();
         verify(balanceRepository).updateBalance("id_user1", 100);
@@ -96,7 +96,7 @@ class MegaTransferEngineTest {
         GState gState = new GStateFake(false, 0, new HashMap<>());
         MegaTransferEngine megaTransferEngine = new MegaTransferEngine(balanceRepository, riskClient_true, gState);
 
-        boolean result = megaTransferEngine.doIt(d, "WEB");
+        boolean result = megaTransferEngine.doIt(d, Channel.Web);
 
         assertThat(result).isTrue();
     }
@@ -107,7 +107,7 @@ class MegaTransferEngineTest {
         GState gState = new GStateFake(false, 0, new HashMap<>());
         MegaTransferEngine megaTransferEngine = new MegaTransferEngine(balanceRepository, riskClient_true, gState);
 
-        boolean result = megaTransferEngine.doIt(d, "WEB");
+        boolean result = megaTransferEngine.doIt(d, Channel.Web);
 
         assertThat(result).isFalse();
     }
@@ -117,7 +117,7 @@ class MegaTransferEngineTest {
         GState gState = new GStateFake(false, 0, new HashMap<>());
         MegaTransferEngine megaTransferEngine = new MegaTransferEngine(balanceRepository, riskClient_false, gState);
 
-        megaTransferEngine.doIt(d, "WEB");
+        megaTransferEngine.doIt(d, Channel.Web);
 
         verify(balanceRepository).queryBalance(eq("id_user1"));
     }
@@ -128,7 +128,7 @@ class MegaTransferEngineTest {
         GState gState = new GStateFake(false, 0, new HashMap<>(cache));
         MegaTransferEngine megaTransferEngine = new MegaTransferEngine(balanceRepository, riskClient_false, gState);
 
-        megaTransferEngine.doIt(d, "WEB");
+        megaTransferEngine.doIt(d, Channel.Web);
         verify(balanceRepository, times(0)).queryBalance(eq("id_user1"));
     }
 
@@ -138,7 +138,7 @@ class MegaTransferEngineTest {
         GState gState = new GStateFake(false, 101, cache);
         MegaTransferEngine megaTransferEngine = new MegaTransferEngine(balanceRepository, riskClient_false, gState);
 
-        megaTransferEngine.doIt(d, "WEB");
+        megaTransferEngine.doIt(d, Channel.Web);
         assertThat(cache).isEmpty();
     }
 }

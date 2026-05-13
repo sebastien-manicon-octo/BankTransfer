@@ -19,7 +19,7 @@ public class MegaTransferEngine {
         this.gState = gState;
     }
 
-    public boolean doIt(TData d, String channel) throws ExternalSideEffectException {
+    public boolean doIt(TData d, Channel channel) throws ExternalSideEffectException {
 
         if (gState.isInMaintenance()) {
             throw new IllegalStateException("Maintenance");
@@ -27,20 +27,7 @@ public class MegaTransferEngine {
 
         gState.incrementTransferCount();
 
-        int fee = 0;
-
-        if ("MOBILE".equals(channel)) {
-            fee += 2;
-        } else {
-            if ("WEB".equals(channel)) {
-                fee += 1;
-            }
-        }
-
-        if (d.vip) {
-            fee--;
-        }
-
+        int fee = channel.getFee(d);
         int net = d.amount - fee;
 
         // BUG volontaire : net peut être négatif mais on continue
