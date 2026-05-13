@@ -1,4 +1,4 @@
-package com.banktransfer;
+package com.banktransfer.state;
 
 import com.banktransfer.external.GlobalState;
 

@@ -1,5 +1,6 @@
-package com.banktransfer;
+package com.banktransfer.riskyanalysis;
 
+import com.banktransfer.TData;
 import com.banktransfer.external.ExternalSideEffectException;
 
 public interface RiskClient {

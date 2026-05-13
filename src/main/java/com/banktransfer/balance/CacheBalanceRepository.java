@@ -1,5 +1,6 @@
-package com.banktransfer;
+package com.banktransfer.balance;
 
+import com.banktransfer.state.GState;
 import com.banktransfer.external.ExternalSideEffectException;
 
 public class CacheBalanceRepository implements BalanceRepository {

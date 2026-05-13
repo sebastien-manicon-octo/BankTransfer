@@ -1,6 +1,9 @@
 package com.banktransfer;
 
+import com.banktransfer.balance.BalanceRepository;
 import com.banktransfer.external.ExternalSideEffectException;
+import com.banktransfer.riskyanalysis.RiskClient;
+import com.banktransfer.state.GState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package com.banktransfer;
+package com.banktransfer.balance;
 
 import com.banktransfer.external.ExternalSideEffectException;
 import com.banktransfer.external.NativeSql;

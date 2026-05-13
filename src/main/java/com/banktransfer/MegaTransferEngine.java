@@ -1,6 +1,14 @@
 package com.banktransfer;
 
+import com.banktransfer.balance.BalanceRepository;
+import com.banktransfer.balance.CacheBalanceRepository;
+import com.banktransfer.balance.SqlBalanceRepository;
 import com.banktransfer.external.ExternalSideEffectException;
+import com.banktransfer.riskyanalysis.HttpRiskClientWrapper;
+import com.banktransfer.riskyanalysis.RiskClient;
+import com.banktransfer.riskyanalysis.RiskyOperationException;
+import com.banktransfer.state.GState;
+import com.banktransfer.state.GStateWrapper;
 
 public class MegaTransferEngine {
 
@@ -20,13 +28,25 @@ public class MegaTransferEngine {
     }
 
     public boolean doIt(TData d, Channel channel) throws ExternalSideEffectException {
+        try {
+            if (gState.isInMaintenance()) {
+                throw new IllegalStateException("Maintenance");
+            }
 
-        if (gState.isInMaintenance()) {
-            throw new IllegalStateException("Maintenance");
+            gState.incrementTransferCount();
+
+            makeTransaction(d, channel);
+            if (gState.getTransferCount() > 100) {
+                gState.cacheClear();
+            }
+
+            return true;
+        } catch (RiskyOperationException e) {
+            return false;
         }
+    }
 
-        gState.incrementTransferCount();
-
+    public void makeTransaction(TData d, Channel channel) throws ExternalSideEffectException, RiskyOperationException {
         int fee = channel.getFee(d);
         int net = d.amount - fee;
 
@@ -35,7 +55,7 @@ public class MegaTransferEngine {
         int balance = balanceRepository.queryBalance(d.from);
 
         if (http.risky(d, net)) {
-            return false; // TODO: Maybe better to throw an exception
+            throw new RiskyOperationException();
         }
 
         balanceRepository.updateBalance(d.from, balance - d.amount);
@@ -46,11 +66,5 @@ public class MegaTransferEngine {
             balanceRepository.updateBalance(d.to, net - 1);
             balanceRepository.updateBalance(d.to, 1);
         }
-
-        if (gState.getTransferCount() > 100) {
-            gState.cacheClear();
-        }
-
-        return true;
     }
 }

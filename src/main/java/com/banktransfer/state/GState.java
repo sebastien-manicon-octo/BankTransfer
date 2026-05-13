@@ -1,4 +1,4 @@
-package com.banktransfer;
+package com.banktransfer.state;
 
 public interface GState {
     boolean isInMaintenance();

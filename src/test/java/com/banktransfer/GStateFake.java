@@ -1,5 +1,7 @@
 package com.banktransfer;
 
+import com.banktransfer.state.GState;
+
 import java.util.Map;
 
 public class GStateFake implements GState {
