@@ -1,8 +1,6 @@
 package com.banktransfer;
 
-import com.banktransfer.balance.BalanceRepository;
-import com.banktransfer.balance.CacheBalanceRepository;
-import com.banktransfer.balance.SqlBalanceRepository;
+import com.banktransfer.balance.*;
 import com.banktransfer.external.ExternalSideEffectException;
 import com.banktransfer.riskyanalysis.HttpRiskClientWrapper;
 import com.banktransfer.riskyanalysis.RiskClient;
@@ -43,28 +41,14 @@ public class MegaTransferEngine {
             return true;
         } catch (RiskyOperationException e) {
             return false;
+        } catch (BalanceRepositoryException e) {
+            throw e.getExternalSideEffectException();
         }
     }
 
-    public void makeTransaction(TData d, Channel channel) throws ExternalSideEffectException, RiskyOperationException {
-        int fee = channel.getFee(d);
-        int net = d.amount - fee;
-
-        // BUG volontaire : net peut être négatif mais on continue
-
-        int balance = balanceRepository.queryBalance(d.from);
-
-        if (http.risky(d, net)) {
-            throw new RiskyOperationException();
-        }
-
-        balanceRepository.updateBalance(d.from, balance - d.amount);
-
-        if (net % 2 == 0) {
-            balanceRepository.updateBalance(d.to, net);
-        } else {
-            balanceRepository.updateBalance(d.to, net - 1);
-            balanceRepository.updateBalance(d.to, 1);
-        }
+    public void makeTransaction(TData d, Channel channel) throws ExternalSideEffectException, RiskyOperationException, BalanceRepositoryException {
+        Balance balance = balanceRepository.queryBalanceFromName(d.from);
+        Transaction transaction = balance.createTransaction(d, channel, http);
+        balanceRepository.saveTransaction(transaction);
     }
 }
