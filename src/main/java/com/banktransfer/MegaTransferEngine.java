@@ -34,10 +34,8 @@ public class MegaTransferEngine {
 
         int balance = balanceRepository.queryBalance(d.from);
 
-        if (http.risky(d.from, net)) {
-            if (!d.vip) {
-                return false;
-            }
+        if (http.risky(d, net)) {
+            return false; // TODO: Maybe better to throw an exception
         }
 
         balanceRepository.updateBalance(d.from, balance - d.amount);
